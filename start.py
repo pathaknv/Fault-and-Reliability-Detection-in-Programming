@@ -2,10 +2,9 @@ import program_graph as pg
 import program_token as pt
 
 data = """
-		int a,b;
-		int c = 10;
-        a = 0;
-        b = a + 1;
+	int a,b,c;
+	int c = 10;
+        b = a / c;
         c = c + b;
         a = b + 2;
     """
@@ -35,8 +34,7 @@ def divide_by_zero(graph , initial_edge , variable_list):
 
 	flg = 0
 	while 1:
-		assign_flg = 0
-		if len(initial_edge) ==0 :
+		if len(initial_edge) == 0:
 			break
 		lexer = pt.get_lexer(initial_edge)
 		while 1:
@@ -45,33 +43,25 @@ def divide_by_zero(graph , initial_edge , variable_list):
 				temp_edge = list(graph.edges(initial_edge))
 				if len(temp_edge) == 0:
 					flg = 1
-					break;
-				initial_edge = temp_edge[0][1] 
+					break
+				initial_edge = temp_edge[0][1]
 				break
-			print("Token")
-			if tok.type == 'ID' and assign_flg == 0:
-				left_varibale = tok.value
-			elif tok.type == 'ASSIGN':
-				assign_flg = 1
-				value = 0
-				while 1:
-					tok = lexer.token()
-					if not tok: 
+			if tok.type == 'ASSIGN':
+				tok = lexer.token()
+				tok = lexer.token()
+				if not tok:
+					temp_edge = list(graph.edges(initial_edge))
+					if len(temp_edge) == 0:
+						flg = 1
 						break
-					if tok.type == 'ID':
-						value = variable_list[tok.value]
-					if tok.type == 'PLUS':
-						tok = lexer.token()
-						if tok.type == 'ID':
-							value = value + variable_list[tok.value]
-							print(value,' = ',value,' + ',variable_list[tok.value])
-						else:
-							value = value + tok.value
-				variable_list[left_varibale] = value		
-
+					initial_edge = temp_edge[0][1]
+					break
+				if tok.type == 'DIVIDE':
+					tok = lexer.token()
+					if variable_list[tok.value] == 0:
+						print('Divide by Zero Error')
 		if flg == 1:
-			break
-
+			break				
 
 lexer = pt.get_lexer(data)
 data_list = pg.get_cfg(data)
@@ -81,6 +71,4 @@ initial_edge = data_list[1]
 pg.cyclomatic_complexity(graph)
 
 variable_list = list_of_varibales()
-print(variable_list)
 divide_by_zero(graph , initial_edge , variable_list)
-print(variable_list)
