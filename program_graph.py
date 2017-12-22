@@ -3,79 +3,70 @@ import matplotlib.pyplot as plt
 
 controlStmt = ['if', 'else', 'while', 'for', 'switch', 'do']
 
-def buildCFG(data):
-    statment = data.split(";")
+def data_pre_processing(data):
+    statment = data.split("\n")
     for i in range(0, len(statment)):
         statment[i] = statment[i].strip()
-        for cntrl in controlStmt:
-            if cntrl in statment[i]:
-                temp = statment[i].split('\n')
-                temp[1] = temp[1].strip()
-                statment[i] = temp[0] + ':' + temp[1]
+        statment[i] = statment[i].replace(';' , '')
 
+    del statment[0]
     del statment[-1]
+    return statment
+
+def buildCFG(data):
+
+    cntrl_flg = 0
+    if_flg = 0
+    while_flg = 0
+    for_flg = 0
+    else_flg = 0
+    statment = data_pre_processing(data)
     cfg = nx.DiGraph()
+    initial_statment = statment[0]
 
-    initial_edge = statment[0]
-    cntrlFlg = 0
-    for i in range(0, len(statment)):
-        for cntrl in controlStmt:
-            if cntrl in statment[i]:
-                if cntrl in ['if', 'while', 'for', 'switch']:
-                    temp = []
-                    temp = statment[i].split(':')
-                    cfg.add_node(temp[0])
-                    cfg.add_node(temp[1])
-
-                    cntrlFlg = 1;
-                    break
-                if cntrl == 'else':
-                    cfg.add_node(statment[i])
-                    cntrlFlg = 1;
-                    break
-        if cntrlFlg == 0:
+    for i in range(0 , len(statment)):
+        if statment[i] not in ['{' , '}' , 'else']:
             cfg.add_node(statment[i])
-        cntrlFlg = 0
 
-    ifFlg = 0
-    elseFlg = 0
-    emptyElse = 0
+    for i in range(0 , len(statment) - 1):
 
-    for i in range(1, len(statment)):
-        for cntrl in controlStmt:
-            if cntrl in statment[i]:
-                if cntrl in ['if', 'while', 'for', 'switch']:
-                    statment[i] = statment[i].replace('if(', '')
-                    statment[i] = statment[i].replace(')', '')
-                    temp = []
-                    temp = statment[i].split(':')
-                    ifPart = 'if(' + temp[0] + ')'
-                    ifBody = temp[1]
-                    cfg.add_edge(statment[i - 1], ifPart)
-                    cfg.add_edge(ifPart, ifBody)
-                    ifFlg = 1
-                    break
-                if cntrl is 'else':
-                    cfg.add_edge(ifPart, statment[i])
-                    elsePart = statment[i]
-                    elseFlg = 1
-                    break
-        if ifFlg == 0 and elseFlg == 0:
-            if emptyElse == 1:
-                cfg.add_edge(ifPart, statment[i])
-            else:
-                cfg.add_edge(statment[i - 1], statment[i])
-        if ifFlg == 1:
-            ifFlg = 0
-            if 'else' not in statment[i + 1]:
-                cfg.add_edge(ifBody, statment[i + 1])
-                emptyElse = 1
-            else:
-                cfg.add_edge(ifBody, statment[i + 2])
-        if elseFlg == 1:
-            cfg.add_edge(elsePart, statment[i + 1])
-            elseFlg = 0
-    return [cfg , initial_edge]
+        if cntrl_flg != 1:
+            for cntrl in controlStmt:
+                if cntrl in statment[i]:
+                    cntrl_flg = 1
+                    control_statment = statment[i]
+                    if cntrl == 'if':
+                        if_flg = 1
+                    if cntrl == 'while':
+                        while_flg = 1
+                    if cntrl == 'for':
+                        for_flg = 1
+                    if cntrl == 'else':
+                        else_flg = 1
+
+        if cntrl_flg == 0:
+            cfg.add_edge(statment[i] , statment[i+1])
+
+        if while_flg == 1 or for_flg == 1:
+
+            if 'while' in  statment[i] or 'for' in statment[i]:
+                cfg.add_edge(statment[i] , statment[i+2])
+            elif statment[i] != '{' and statment[i+1] != '}' and statment[i] != '}':
+                cfg.add_edge(statment[i] , statment[i+1])
+
+            if statment[i] == '}':
+                if i+1 <= len(statment):
+                    cfg.add_edge(control_statment , statment[i+1])
+                    cfg.add_edge(statment[i-1] , control_statment)
+                else:
+                    cfg.add_edge(statment[i-1] , control_statment)
+                cntrl_flg = 0
+                if while_flg == 1:
+                    while_flg = 0
+                else:
+                    for_flg = 0 
+
+    return [cfg , initial_statment]
 
 def cyclomatic_complexity(cfg):
     nodeCount = cfg.number_of_nodes()
@@ -84,6 +75,18 @@ def cyclomatic_complexity(cfg):
     print('\nCyclomatic Complexity of Code: ', cc)
 
 def get_cfg(data):
-	cfg = nx.DiGraph
-	data_list = buildCFG(data)
-	return data_list
+    cfg = nx.DiGraph
+    data_list = buildCFG(data)
+    return data_list
+
+def show_nodes(cfg):
+    print(cfg.nodes())
+
+def show_edges(cfg):
+    print(cfg.edges())
+
+def cfgGUI(cfg):
+    nx.draw(cfg)
+    plt.savefig('cfg.png')
+    plt.show()
+  
