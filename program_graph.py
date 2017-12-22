@@ -41,8 +41,6 @@ def buildCFG(data):
                         while_flg = 1
                     if cntrl == 'for':
                         for_flg = 1
-                    if cntrl == 'else':
-                        else_flg = 1
 
         if cntrl_flg == 0:
             cfg.add_edge(statment[i] , statment[i+1])
@@ -66,6 +64,38 @@ def buildCFG(data):
                 else:
                     for_flg = 0 
 
+        if else_flg == 1:
+
+            if statment[i] == 'else':
+                cfg.add_edge(control_statment , statment[i+2])
+            elif statment[i] !='{' and statment[i+1] != '}' and statment[i] != '}':
+                cfg.add_edge(statment[i] , statment[i+1])
+
+            if statment[i] == '}':
+                cntrl_flg = 0
+                else_flg = 0
+                if i+1 <= len(statment):
+                    cfg.add_edge(last_if_statment , statment[i+1])
+                    cfg.add_edge(statment[i-1] , statment[i+1])            
+                    
+        if if_flg == 1:
+
+            if 'if' in statment[i]:
+                cfg.add_edge(statment[i] , statment[i+2])
+            elif statment[i] !='{' and statment[i+1] != '}' and statment[i] != '}':
+                cfg.add_edge(statment[i] , statment[i+1])
+
+            if statment[i] == '}':
+                if i+1 <= len(statment):
+                    if statment[i+1] == 'else':
+                        last_if_statment = statment[i-1]
+                        else_flg = 1
+                        if_flg = 0
+                    else:
+                        cfg.add_edge(statment[i-1] , statment[i+1])
+                        cfg.add_edge(control_statment , statment[i+1])
+
+
     return [cfg , initial_statment]
 
 def cyclomatic_complexity(cfg):
@@ -83,7 +113,8 @@ def show_nodes(cfg):
     print(cfg.nodes())
 
 def show_edges(cfg):
-    print(cfg.edges())
+    for edge in cfg.edges():
+        print(edge)
 
 def cfgGUI(cfg):
     nx.draw(cfg)
