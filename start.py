@@ -2,11 +2,27 @@ import program_graph as pg
 import program_token as pt
 
 data = """
-	int a,b,c;
+	int a,b;
 	int c = 10;
-        b = a / c;
-        c = c + b;
-        a = b + 2;
+    b = a / c;
+    if(b > 0)
+    {
+    	b = b - 1;
+    	a = a - 1;
+    }
+    else
+    {
+    	b = b + 1;
+    	a = a + 1;
+    }
+    c = b - a;
+    if(a > 0) 
+    {
+    	a = a + 1;
+    	b = b + 1;
+    }
+    c = c + b;
+    a = b + c;
     """
 
 def list_of_varibales():
@@ -65,10 +81,9 @@ def divide_by_zero(graph , initial_edge , variable_list):
 
 lexer = pt.get_lexer(data)
 data_list = pg.get_cfg(data)
-
 graph = data_list[0]
-initial_edge = data_list[1]
+initial_statment = data_list[1]
 pg.cyclomatic_complexity(graph)
-
-variable_list = list_of_varibales()
-divide_by_zero(graph , initial_edge , variable_list)
+pg.show_nodes(graph)
+print('\n')
+pg.show_edges(graph)
