@@ -22,7 +22,19 @@ data = """
     	b = b + 1;
     }
     c = c + b;
+    a = b - c;
+    while(c > 0)
+    {
+    	a = a + 2;
+    	b = a + b;
+    }
     a = b + c;
+    for(i=0; i<100; i++)
+    {
+    	a = a + i;
+    	b = c + i; 
+    }
+    a = a + b + c; 
     """
 
 def list_of_varibales():
@@ -87,3 +99,4 @@ pg.cyclomatic_complexity(graph)
 pg.show_nodes(graph)
 print('\n')
 pg.show_edges(graph)
+pg.cfgGUI(graph)
