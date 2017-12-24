@@ -49,6 +49,7 @@ def buildCFG(data):
 
             if 'while' in  statment[i] or 'for' in statment[i]:
                 cfg.add_edge(statment[i] , statment[i+2])
+                print('Hahahah',statment[i] , statment[i+2])
             elif statment[i] != '{' and statment[i+1] != '}' and statment[i] != '}':
                 cfg.add_edge(statment[i] , statment[i+1])
 
@@ -92,6 +93,8 @@ def buildCFG(data):
                         else_flg = 1
                         if_flg = 0
                     else:
+                        if_flg = 0
+                        cntrl_flg = 0
                         cfg.add_edge(statment[i-1] , statment[i+1])
                         cfg.add_edge(control_statment , statment[i+1])
 
