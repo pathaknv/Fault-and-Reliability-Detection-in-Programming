@@ -28,6 +28,7 @@ def buildCFG(data):
         if statment[i] not in ['{' , '}' , 'else']:
             cfg.add_node(statment[i])
             g1.node(statment[i])
+
     for i in range(0 , len(statment) - 1):
 
         if cntrl_flg != 1:
@@ -45,6 +46,7 @@ def buildCFG(data):
         if cntrl_flg == 0:
             cfg.add_edge(statment[i] , statment[i+1])
             g1.edge(statment[i], statment[i+1])
+
         if while_flg == 1 or for_flg == 1:
 
             if 'while' in  statment[i] or 'for' in statment[i]:
@@ -53,6 +55,7 @@ def buildCFG(data):
             elif statment[i] != '{' and statment[i+1] != '}' and statment[i] != '}':
                 cfg.add_edge(statment[i] , statment[i+1])
                 g1.edge(statment[i], statment[i+1])
+
 
             if statment[i] == '}':
                 if i+1 <= len(statment):
@@ -63,6 +66,7 @@ def buildCFG(data):
                 else:
                     cfg.add_edge(statment[i-1] , control_statment)
                     g1.edge(statment[i-1] , control_statment)
+
                 cntrl_flg = 0
                 if while_flg == 1:
                     while_flg = 0
@@ -77,6 +81,7 @@ def buildCFG(data):
             elif statment[i] !='{' and statment[i+1] != '}' and statment[i] != '}':
                 cfg.add_edge(statment[i] , statment[i+1])
                 g1.edge(statment[i] , statment[i+1])
+
 
             if statment[i] == '}':
                 cntrl_flg = 0
@@ -132,5 +137,7 @@ def show_edges(cfg):
     for edge in cfg.edges():
         print(edge)
 
-
-  
+def cfgGUI(cfg):
+    nx.draw(cfg)
+    plt.savefig('cfg.png')
+    plt.show()
