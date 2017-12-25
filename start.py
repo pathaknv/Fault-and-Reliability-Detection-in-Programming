@@ -12,8 +12,8 @@ data = """
     }
     else
     {
-    	b = b + 1;
-    	a = a + 1;
+    	b = b + 3;
+    	a = a + 3;
     }
     c = b - a;
     if(a > 0) 
