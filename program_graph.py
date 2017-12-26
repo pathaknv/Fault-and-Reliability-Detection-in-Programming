@@ -1,6 +1,9 @@
 import networkx as nx
 import graphviz as gv
-g1 = gv.Digraph(format='svg')
+g1 = gv.Digraph(format='png')
+g1.attr('graph', bgcolor='#333333',label='Control Flow Graph',fontcolor='white',fontsize='16')
+g1.attr('node',fontname='Helvetica',fontcolor='white',color='white',style='filled',fillcolor='#006699')
+g1.attr('edge',style ='dashed',color='white',arrowhead='open',fontname='Courier',fontsize='12',fontcolor='white')
 controlStmt = ['if', 'else', 'while', 'for', 'switch', 'do']
 
 def data_pre_processing(data):
@@ -116,7 +119,7 @@ def buildCFG(data):
                         g1.edge(control_statment , statment[i+1]) 
 
     #print(g1.source)
-    filename = g1.render(filename='img/g1')    
+    filename = g1.render(filename='img/g1',view=True)    
     return [cfg , initial_statment]
 
 def cyclomatic_complexity(cfg):
