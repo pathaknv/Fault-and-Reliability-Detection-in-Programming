@@ -70,8 +70,9 @@ def divide_by_zero(graph , initial_statment , variable_list , data):
 						divide_by_zero_list.append(current_edge)
 
 
-def calculate_all_loop_iterations(graph , initial_statment , variable_list):
+def data_flow(graph, initial_statment, variable_list):
 		
+	varaible_access_status = []
 	statment_stack = []
 	statment_stack.append(initial_statment)
 	if_flg = 0
@@ -110,6 +111,7 @@ def calculate_all_loop_iterations(graph , initial_statment , variable_list):
 						else:
 							if variable_list[lhs_variable] > variable_list[current_token.value]:
 								ans_flg = 1 
+						varaible_access_status.append(lhs_variable)
 
 				else:
 					if current_token.value in comparision_operators:
@@ -161,13 +163,16 @@ def calculate_all_loop_iterations(graph , initial_statment , variable_list):
 									rhs_value = rhs_value - current_token.value
 								else:
 									rhs_value = rhs_value - variable_list[current_token.value]
-								variable_list[lhs_variable] = rhs_value	
+								variable_list[lhs_variable] = rhs_value
+							if current_token.type != 'NUMBER' and current_token.value not in varaible_access_status:
+								varaible_access_status.append(current_token.value)
 		
 						else:
 							if current_token.type == 'NUMBER':
 								rhs_value = current_token.value
 							else:
 								rhs_value = variable_list[current_token.value]
+								varaible_access_status.append(current_token.value)
 
 				if current_token.type == 'ASSIGN':
 					lhs_variable = previous_token.value
@@ -193,5 +198,10 @@ def calculate_all_loop_iterations(graph , initial_statment , variable_list):
 				del statment_stack[0]
 			if_flg = 0
 
-		print(variable_list)
-		print(statment_stack)
+	return varaible_access_status
+
+def unused_varaible_detection(graph, initial_statment, variable_list):
+	varaible_access_status = data_flow(graph, initial_statment, variable_list)
+	for variable in variable_list.keys():
+		if variable not in varaible_access_status:
+			print('Variable "',variable, '" is not used in program')

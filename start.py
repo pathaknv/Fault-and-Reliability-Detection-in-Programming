@@ -4,7 +4,7 @@ import static_dynamic_functions as psd
 
 data = """
 	int a,b;
-	int c = 0;
+	int c = 10;
     b = a / c;
     if(b > 0)
     {
@@ -19,7 +19,7 @@ data = """
     }
     if(a > 0) 
     {
-    	a = a / 0;
+    	a = a / c;
     	b = b + 1;
     }
     a = a - b + c;
@@ -29,20 +29,24 @@ data = """
     	b = a + b;
     }
     a = b + c;
-    for(i=0; i<100; i++)
-    {
-    	a = a + i;
-    	b = c + i; 
-    }
     a = a + b + c; 
     """
+
+data1 = """
+
+    int a,b;
+    int c = 10;
+    a = c - 1;
+    c = a + c;
+"""
 		
 
-lexer = pt.get_lexer(data)
-data_list = pg.get_cfg(data)
+lexer = pt.get_lexer(data1)
+data_list = pg.get_cfg(data1)
 graph = data_list[0]
 initial_statment = data_list[1]
 pg.cyclomatic_complexity(graph)
 variable_list = psd.list_of_varibales(lexer)
 print(variable_list)
-psd.divide_by_zero(graph , initial_statment , variable_list , data) 
+#psd.divide_by_zero(graph , initial_statment , variable_list , data)
+psd.unused_varaible_detection(graph, initial_statment, variable_list)
