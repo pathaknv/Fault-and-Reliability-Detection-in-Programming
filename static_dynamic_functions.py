@@ -2,6 +2,7 @@ import program_graph as pg
 import program_token as pt
 
 comparision_operators = ['>' , '<' , '>=' , '<=' , '==']
+binary_operators = ['+', '-', '*', '/', '==', '>=', '<=', '>', '<']
 
 def list_of_varibales(lexer):
 	variable_list = {}
@@ -205,3 +206,47 @@ def unused_varaible_detection(graph, initial_statment, variable_list):
 	for variable in variable_list.keys():
 		if variable not in varaible_access_status:
 			print('Variable "',variable, '" is not used in program')
+
+def balanced_parenthesis(symbolString):
+    s = []
+    balanced = True
+    index = 0
+    while index < len(symbolString) and balanced:
+        symbol = symbolString[index]
+        if symbol == "(":
+            s.append(symbol)
+        else:
+            if len(s) == 0 and symbol in ['(', ')']:
+                balanced = False
+            elif symbol == ')':
+                s.pop()
+
+        index = index + 1
+
+    if balanced and len(s) == 0:
+        return True
+    else:
+        return False
+
+def parenthesis_checker(data):
+	statment_list = pg.data_pre_processing(data)
+	for i in range(0 , len(statment_list)):
+		if balanced_parenthesis(statment_list[i]) == False:
+			print('Unbalanced Parenthesis on Line Number: ',i+1)
+
+def valid_expression(data):
+	statment_list = pg.data_pre_processing(data)
+	for i in range(0, len(statment_list)):
+		lexer = pt.get_lexer(statment_list[i])
+		current_token = ''
+		previous_token = ''
+		while 1:
+			if not current_token:
+				break
+			current_token = lexer.token()
+			if current_token.value in binary_operators:
+				if previous_token.type == 'ID':
+					current_token = lexer.token()
+					if current_token.type != 'ID':
+						print('Invalid Equation at Line Number: ', i+1)
+					
