@@ -3,18 +3,67 @@ import program_token as pt
 
 comparision_operators = ['>' , '<' , '>=' , '<=' , '==']
 binary_operators = ['+', '-', '*', '/', '==', '>=', '<=', '>', '<']
+variable_memory_mapping = { 'int': 4, 'float': 4, 'double': 8, 'char': 1}
+
+def memory_usage(graph, initial_statment, variable_list, variable_count, lexer):
+	total_memory = 0
+	for key,value in variable_count.items():
+		total_memory = total_memory + variable_memory_mapping[key]*value
+	variable_access_status = data_flow(graph, initial_statment, variable_list)
+
+
+	while 1:
+		tok = lexer.token()
+		if not tok: break
+		if tok.type in ['INT' , 'FLOAT' , 'DOUBLE' , 'CHAR']:
+			variable_type = str(tok.type).lower()
+			tok = lexer.token()
+			if str(tok.value) in variable_access_status:
+				variable_count[variable_type] -= 1
+				tok = lexer.token()
+				while tok.type != 'SEMICOLON':
+					tok = lexer.token()
+					if tok.type == 'COMMA':
+						tok = lexer.token()
+						if tok.value in variable_access_status:
+							variable_count[variable_type] -= 1
+
+	memory_with_unused_variable = 0
+	for key,value in variable_count.items():
+		memory_with_unused_variable += variable_memory_mapping[key]*value
+	return [total_memory, memory_with_unused_variable]
+
+def category_wise_variable_count(lexer):
+	variable_count = {}
+	variable_count['int'] = 0
+	variable_count['float'] = 0
+	variable_count['double'] = 0
+	variable_count['char'] = 0
+	while 1:
+		tok = lexer.token()
+		if not tok:
+			break
+		if tok.type in ['INT', 'FLOAT', 'DOUBLE', 'CHAR']:
+			variable_count[str(tok.type).lower()] = variable_count[str(tok.type).lower()] + 1
+			variable_type = tok.type
+			tok = lexer.token()
+			while tok.type != 'SEMICOLON':
+				tok = lexer.token()
+				if tok.type == 'COMMA':
+					variable_count[str(variable_type).lower()] = variable_count[str(variable_type).lower()] + 1
+	return variable_count
 
 def list_of_varibales(lexer):
 	variable_list = {}
 	flg = 0
 	while 1:
 		tok = lexer.token()
-		if not tok: break  
+		if not tok: break
 		if tok.type in ['INT' , 'FLOAT' , 'DOUBLE' , 'CHAR']:
 			tok = lexer.token()
 			variable_list[tok.value] = 0
 			last_variable = tok.value
-			while tok.type != 'SEMICOLON': 
+			while tok.type != 'SEMICOLON':
 				tok = lexer.token()
 				if tok.type == 'COMMA':
 					tok = lexer.token()
@@ -38,6 +87,7 @@ def divide_by_zero(graph , initial_statment , variable_list , data):
 	divide_by_zero_list = []
 	statment_stack = []
 	statment_stack.append(initial_statment)
+	error_flg = 0
 
 	while 1:
 		if len(statment_stack) == 0:
@@ -52,7 +102,7 @@ def divide_by_zero(graph , initial_statment , variable_list , data):
 		while i < len(next_edge):
 			statment_stack.append(next_edge[i][1])
 			i += 1
-		
+
 		lexer = pt.get_lexer(current_edge)
 		while 1:
 			tok = lexer.token()
@@ -67,15 +117,23 @@ def divide_by_zero(graph , initial_statment , variable_list , data):
 							flg = 1
 							break
 					if flg != 1:
+						error_flg = 1
 						get_error_line_number(current_edge , data)
 						divide_by_zero_list.append(current_edge)
 
+	if error_flg == 0:
+		print('\nNone Divide by zero')
 
 def data_flow(graph, initial_statment, variable_list):
-		
-	varaible_access_status = []
+
+	variable_access_status = []
 	statment_stack = []
 	statment_stack.append(initial_statment)
+	used_variable_type = {}
+	used_variable_type['int'] = 0
+	used_variable_type['float'] = 0
+	used_variable_type['double'] = 0
+	used_variable_type['char'] = 0
 	if_flg = 0
 	ans_flg = 0
 	while 1:
@@ -111,8 +169,8 @@ def data_flow(graph, initial_statment, variable_list):
 								ans_flg = 1
 						else:
 							if variable_list[lhs_variable] > variable_list[current_token.value]:
-								ans_flg = 1 
-						varaible_access_status.append(lhs_variable)
+								ans_flg = 1
+						variable_access_status.append(lhs_variable)
 
 				else:
 					if current_token.value in comparision_operators:
@@ -139,41 +197,42 @@ def data_flow(graph, initial_statment, variable_list):
 						if operator_flg == 1:
 
 							if operator_type == 'DIVIDE':
-								if current_token.type == 'NUMBER': 
+								if current_token.type == 'NUMBER':
 									rhs_value = rhs_value / current_token.value
 								else:
 									rhs_value = rhs_value / variable_list[current_token.value]
 								variable_list[lhs_variable] = rhs_value
 
 							if operator_type == 'MULT':
-								if current_token.type == 'NUMBER': 
+								if current_token.type == 'NUMBER':
 									rhs_value = rhs_value * current_token.value
 								else:
 									rhs_value = rhs_value * variable_list[current_token.value]
 								variable_list[lhs_variable] = rhs_value
-									
+
 							if operator_type == 'PLUS':
-								if current_token.type == 'NUMBER': 
+								if current_token.type == 'NUMBER':
 									rhs_value = rhs_value + current_token.value
 								else:
 									rhs_value = rhs_value + variable_list[current_token.value]
 								variable_list[lhs_variable] = rhs_value
 
 							if operator_type == 'MINUS':
-								if current_token.type == 'NUMBER': 
+								if current_token.type == 'NUMBER':
 									rhs_value = rhs_value - current_token.value
 								else:
 									rhs_value = rhs_value - variable_list[current_token.value]
 								variable_list[lhs_variable] = rhs_value
-							if current_token.type != 'NUMBER' and current_token.value not in varaible_access_status:
-								varaible_access_status.append(current_token.value)
-		
+							if current_token.type != 'NUMBER' and current_token.value not in variable_access_status:
+								variable_access_status.append(current_token.value)
+
 						else:
 							if current_token.type == 'NUMBER':
 								rhs_value = current_token.value
 							else:
 								rhs_value = variable_list[current_token.value]
-								varaible_access_status.append(current_token.value)
+								if current_token.value not in variable_access_status:
+									variable_access_status.append(current_token.value)
 
 				if current_token.type == 'ASSIGN':
 					lhs_variable = previous_token.value
@@ -199,13 +258,18 @@ def data_flow(graph, initial_statment, variable_list):
 				del statment_stack[0]
 			if_flg = 0
 
-	return varaible_access_status
+	return variable_access_status
 
-def unused_varaible_detection(graph, initial_statment, variable_list):
-	varaible_access_status = data_flow(graph, initial_statment, variable_list)
+def unused_variable_detection(graph, initial_statment, variable_list):
+	variable_access_status = data_flow(graph, initial_statment, variable_list)
+	error_flg = 0
 	for variable in variable_list.keys():
-		if variable not in varaible_access_status:
+		if variable not in variable_access_status:
+			error_flg = 1
 			print('Variable "',variable, '" is not used in program')
+
+	if error_flg == 0:
+		print('\nNo unused variable detected')
 
 def balanced_parenthesis(symbolString):
     s = []
@@ -230,9 +294,15 @@ def balanced_parenthesis(symbolString):
 
 def parenthesis_checker(data):
 	statment_list = pg.data_pre_processing(data)
+	error_flg = 0
+	print('')
 	for i in range(0 , len(statment_list)):
 		if balanced_parenthesis(statment_list[i]) == False:
+			error_flg = 1
 			print('Unbalanced Parenthesis on Line Number: ',i+1)
+
+	if error_flg == 0:
+		print('\nBalanced Parenthesis')
 
 def valid_expression(data):
 	statment_list = pg.data_pre_processing(data)
@@ -249,4 +319,3 @@ def valid_expression(data):
 					current_token = lexer.token()
 					if current_token.type != 'ID':
 						print('Invalid Equation at Line Number: ', i+1)
-					

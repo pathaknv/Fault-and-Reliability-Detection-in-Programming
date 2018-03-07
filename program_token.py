@@ -74,7 +74,7 @@ def t_COMMENT(t):
     r'\#.*'
     pass
 
-def get_lexer(data): 
+def get_lexer(data):
 	lexer = _lex.lex()
 	lexer.input(data)
 	return lexer

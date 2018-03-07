@@ -1,16 +1,17 @@
 import networkx as nx
 import graphviz as gv
 g1 = gv.Digraph(format='png')
-g1.attr('graph', bgcolor='#333333',label='Control Flow Graph',fontcolor='white',fontsize='16')
-g1.attr('node',fontname='Helvetica',fontcolor='white',color='white',style='filled',fillcolor='#006699')
-g1.attr('edge',style ='dashed',color='white',arrowhead='open',fontname='Courier',fontsize='12',fontcolor='white')
+g1.attr('graph', bgcolor='#FFFFFF',label='Control Flow Graph',fontcolor='white',fontsize='16')
+g1.attr('node',fontname='Helvetica',fontcolor='black',color='black',style='filled',fillcolor='#FFFFFF')
+g1.attr('edge',style ='dashed',color='black',arrowhead='open',fontname='Courier',fontsize='12',fontcolor='black')
 controlStmt = ['if', 'else', 'while', 'for', 'switch', 'do']
 
 def data_pre_processing(data):
     statment = data.split("\n")
     for i in range(0, len(statment)):
-        statment[i] = statment[i].strip()
-        statment[i] = statment[i].replace(';' , '')
+        if 'for' not in statment[i]:
+            statment[i] = statment[i].strip()
+            statment[i] = statment[i].replace(';' , '')
 
     del statment[0]
     del statment[-1]
@@ -74,7 +75,7 @@ def buildCFG(data):
                 if while_flg == 1:
                     while_flg = 0
                 else:
-                    for_flg = 0 
+                    for_flg = 0
 
         if else_flg == 1:
 
@@ -92,17 +93,17 @@ def buildCFG(data):
                 if i+1 <= len(statment):
                      cfg.add_edge(last_if_statment , statment[i+1])
                      g1.edge(last_if_statment  , statment[i+1])
-                     cfg.add_edge(statment[i-1] , statment[i+1])   
-                     g1.edge(statment[i-1]  , statment[i+1])         
-                    
+                     cfg.add_edge(statment[i-1] , statment[i+1])
+                     g1.edge(statment[i-1]  , statment[i+1])
+
         if if_flg == 1:
 
             if 'if' in statment[i]:
                 cfg.add_edge(statment[i] , statment[i+2])
-                g1.edge(statment[i]  , statment[i+2]) 
+                g1.edge(statment[i]  , statment[i+2])
             elif statment[i] !='{' and statment[i+1] != '}' and statment[i] != '}':
                 cfg.add_edge(statment[i] , statment[i+1])
-                g1.edge(statment[i]  , statment[i+1]) 
+                g1.edge(statment[i]  , statment[i+1])
 
             if statment[i] == '}':
                 if i+1 <= len(statment):
@@ -114,18 +115,18 @@ def buildCFG(data):
                         if_flg = 0
                         cntrl_flg = 0
                         cfg.add_edge(statment[i-1] , statment[i+1])
-                        g1.edge(statment[i-1]  , statment[i+1]) 
+                        g1.edge(statment[i-1]  , statment[i+1])
                         cfg.add_edge(control_statment , statment[i+1])
-                        g1.edge(control_statment , statment[i+1]) 
+                        g1.edge(control_statment , statment[i+1])
 
     #print(g1.source)
-    filename = g1.render(filename='img/g1',view=True)    
-    return [cfg , initial_statment]
+    filename = g1.render(filename='img/g1')
+    return [cfg , initial_statment, g1]
 
 def cyclomatic_complexity(cfg):
     nodeCount = cfg.number_of_nodes()
     edgeCount = cfg.number_of_edges()
-    cc = edgeCount - nodeCount + 2      
+    cc = edgeCount - nodeCount + 2
     print('\nCyclomatic Complexity of Code: ', cc)
 
 def get_cfg(data):

@@ -1,0 +1,38 @@
+#Testcases
+
+#Unused Variable Testcases
+
+T-1
+int x,y = 5;
+int n,z = 10;
+x = z - 5;
+z = x + z;
+
+T-2
+int x,y = 5;
+int z = 10;
+x = z - 5;
+if(x > 5)
+{
+  x = x - 1;
+}
+z = x + z;
+
+T-3
+int x,y = 5;
+int z = 10;
+x = z - 5;
+while(x > 5)
+{
+  z = z + x;
+  x = x - 1;
+}
+z = x + z;
+
+#Parenthesis Checker Testcases
+
+T-1
+int x,y = 5;
+int n,z = 10;
+x = z - 5;
+z =
