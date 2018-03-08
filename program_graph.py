@@ -77,6 +77,10 @@ def buildCFG(data):
                 else:
                     for_flg = 0
 
+            if statment[i+1] == '}' and i+1 == len(statment)-1:
+                cfg.add_edge(statment[i] , control_statment)
+                g1.edge(statment[i] , control_statment)
+
         if else_flg == 1:
 
             if statment[i] == 'else':

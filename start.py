@@ -3,20 +3,60 @@ import program_token as pt
 import static_dynamic_functions as psd
 
 data = """
-int x,y = 5;
-int z = 10;
-x = z - 5;
-if(x > 5)
+int a,b;
+int s,d;
+int value;
+if(a > b)
 {
-  x = x - 1;
+    d = a - b;
 }
 else
 {
-x = x + 1;
+    d = b - a;
 }
-z = x + z;
     """
 
+data1 = """
+int a,b;
+int value;
+value = a*a - b*b;
+"""
+
+data2 = """
+int num, n;
+int sum = 0;
+num = 1;
+n = 10;
+while(num < n)
+{
+  sum = sum + num;
+  num = num + 1;
+}
+"""
+
+data3 = """
+    int n, sum;
+    n = 10;
+    sum = n(n+1)/2;
+    sum;
+"""
+
+data4 = """
+int n;
+int sum = 0, i;
+n = 10;
+for(i=1; i<=n; i++)
+{
+    sum = sum + i;
+}
+"""
+
+data5 = """
+int x = 14;
+int y,t = 10;
+int sum;
+sum = x + y;
+"""
 
 lexer = pt.get_lexer(data)
 data_list = pg.get_cfg(data)
