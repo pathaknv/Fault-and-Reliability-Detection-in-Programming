@@ -2,15 +2,28 @@ digraph {
 	graph [bgcolor="#FFFFFF" fontcolor=white fontsize=16 label="Control Flow Graph"]
 	node [color=black fillcolor="#FFFFFF" fontcolor=black fontname=Helvetica style=filled]
 	edge [arrowhead=open color=black fontcolor=black fontname=Courier fontsize=12 style=dashed]
-	"int a,b"
-	"int s,d"
-	"int value"
+	"int a=135749,b=163231"
+	"int min,i=2"
 	"if(a > b)"
-	"d = a - b"
-	"d = b - a"
-	"int a,b" -> "int s,d"
-	"int s,d" -> "int value"
-	"int value" -> "if(a > b)"
-	"if(a > b)" -> "d = a - b"
-	"if(a > b)" -> "d = b - a"
+	"min = b"
+	"min = a"
+	"while(i <= min)"
+	"if(a%i==0 & b%i==0)"
+	"printf(\"%d"
+	"\",i)"
+	break
+	"i++"
+	"int a=135749,b=163231" -> "int min,i=2"
+	"int min,i=2" -> "if(a > b)"
+	"if(a > b)" -> "min = b"
+	"if(a > b)" -> "min = a"
+	"min = b" -> "while(i <= min)"
+	"min = a" -> "while(i <= min)"
+	"while(i <= min)" -> "if(a%i==0 & b%i==0)"
+	"if(a%i==0 & b%i==0)" -> "{"
+	"printf(\"%d" -> "\",i)"
+	"\",i)" -> break
+	"while(i <= min)" -> "i++"
+	break -> "while(i <= min)"
+	"i++" -> "}"
 }

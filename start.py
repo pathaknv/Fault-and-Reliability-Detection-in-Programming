@@ -3,16 +3,24 @@ import program_token as pt
 import static_dynamic_functions as psd
 
 data = """
-int a,b;
-int s,d;
-int value;
+int a=135749,b=163231;
+int min,i=2;
 if(a > b)
 {
-    d = a - b;
+min = b;
 }
 else
 {
-    d = b - a;
+min = a;
+}
+while(i <= min)
+{
+if(a%i==0 & b%i==0)
+{
+  printf("%d\n",i);
+  break;
+}
+i++;
 }
     """
 
