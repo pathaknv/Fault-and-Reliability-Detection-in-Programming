@@ -19,11 +19,7 @@ def data_pre_processing(data):
 
 def buildCFG(data):
 
-    cntrl_flg = 0
-    if_flg = 0
-    while_flg = 0
-    for_flg = 0
-    else_flg = 0
+    cntrl_flg = 0, if_flg = 0, while_flg = 0, for_flg = 0, else_flg = 0
     statment = data_pre_processing(data)
     cfg = nx.DiGraph()
     initial_statment = statment[0]
@@ -52,7 +48,6 @@ def buildCFG(data):
             g1.edge(statment[i], statment[i+1])
 
         if while_flg == 1 or for_flg == 1:
-
             if 'while' in  statment[i] or 'for' in statment[i]:
                 cfg.add_edge(statment[i] , statment[i+2])
                 g1.edge(statment[i], statment[i+2])
